@@ -10,7 +10,7 @@ void injectedThread() {
 
 		if (hwnd == NULL) {
 			if (firstInjectMessage) {
-				MessageBox(NULL, L"Game Not Found", L"Error", MB_OK);
+				MessageBox(NULL, L"Game Not Found, Close Process", L"Error", MB_OK);
 				firstInjectMessage = false;
 			}
 		}
@@ -19,21 +19,26 @@ void injectedThread() {
 				MessageBox(hwnd, L"Cheat injected", L"InternalMemoryHack", MB_OK);
 				firstInjectMessage = false;
 			}
-			if (GetAsyncKeyState('M')) {
+			if (GetAsyncKeyState(VK_RSHIFT) & 0x8000) {
 				DWORD* playerBase = (DWORD*)0x017EED18;
 				DWORD* gameBase = (DWORD*)(*playerBase + 0xA90);
 				DWORD* goldValue = (DWORD*)(*gameBase + 4);
-				*goldValue = 999999;
-
-
-				if (notPrinted) {
+				if (!IsBadWritePtr(goldValue, sizeof(DWORD))) {
+					*goldValue = 999999;
+					if (notPrinted) {
 					MessageBox(hwnd, L"Gold set", L"InternalMemoryHack", MB_OK);
 					notPrinted = false;
 				}
 				notPrinted = true;
+				}
+				else {
+					MessageBox(hwnd, L"Join a game, gold value not found", L"Error", MB_OK);
+				}
+
+				
 			}
 		}
-		Sleep(500);
+		Sleep(100);
 	}
 }
 
